@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="https://dohliam.github.io/dropin-minimal-css/min/clmaterial.min.css">
+  </head>
+  <body>
+    <div id="trovaAula">
+      <h1>Trova l'aula</h1>
+
+      <label for="Giorno">Giorno:</label>
+      <select id="Giorno" onchange="cercaAula()"></select>
+
+      <label for="Ora">Ora:</label>
+      <select id="Ora" onchange="cercaAula()"></select>
+
+      <label for="Anno">Anno:</label>
+      <select id="Anno" onchange="cercaAula()"></select>
+
+      <label for="Sezione">Sezione:</label>
+      <select id="Sezione" onchange="cercaAula()"></select>
+
+      <h2 id="aula">AULA:</h2>
+
+      <script src="./data/aule.js"></script>
+      <script src="./data/timetable.js"></script>
+      <script src="./libs/script.js"></script>
+    </div>
+
+    <script src="https://dohliam.github.io/dropin-minimal-css/switcher.js" type="text/javascript"></script>
+
+  </body>
+</html>
