@@ -1,4 +1,4 @@
-const GIORNI = ["LUNEDÌ", "MARTEDÌ", "MERCOLEDÌ", "GIOVEDÌ", "VENERDÌ", "SABATO", "DOMENICA"];
+const GIORNI = ["DOMENICA", "LUNEDI'", "MARTEDI'", "MERCOLEDI'", "GIOVEDI'", "VENERDI'", "SABATO"];
 
 const ORE_MAP = new Map();
 ORE_MAP.set("08:00 - 09:00", 1);
@@ -21,16 +21,22 @@ let roomMap = null;
 let activityWeeklyMap = null;
 
 const schoolMap = new Map();
+const schoolByYearMap = new Map();
 const giorniSet = new Set();
 const oreSet = new Set();
 
 try {
   roomMap = createHourlyActivityMap(aule);
   activityWeeklyMap = createActivityWeeklyMap(timetable);
-  populateSchoolMap(roomMap, schoolMap, giorniSet, oreSet);
-  populateSelectBox("#Giorno", giorniSet);
+  populateSchoolMap(roomMap, schoolMap, schoolByYearMap, giorniSet, oreSet);
+
+  const currentDay = GIORNI[new Date().getDay()];
+
+  populateSelectBox("#Giorno", giorniSet, currentDay);
   populateSelectBox("#Ora", oreSet);
   populateSelectBox("#Indirizzo", Array.from(schoolMap.keys()));
+
+  updateClassiSelectbox(schoolByYearMap);
 } catch (e) {
   console.error(e);
   if (e instanceof ValidationError) {
@@ -46,12 +52,14 @@ document.querySelector("#Anno").addEventListener("change", () => {
   updateSezioniSelectbox(schoolMap);
 });
 
-document.querySelector("#cerca").addEventListener("click", () => cercaAula());
+document.querySelector("#cerca").addEventListener("click", () => cerca());
+document.querySelector("#cercaPerClasse").addEventListener("click", () => cercaPerClasse());
 
-/**
- * Cerca l'aula
- */
-function cercaAula() {
+document.querySelectorAll('#trovaAula input[name="option"]').forEach((radioButton) => {
+   radioButton.addEventListener("change", () => updateClassiSelectbox(schoolByYearMap));
+});
+
+function cerca() {
   try {
     let giorno = document.querySelector("#Giorno").value;
     let ora = document.querySelector("#Ora").value;
@@ -59,12 +67,43 @@ function cercaAula() {
     let indirizzo = document.querySelector("#Indirizzo").value;
     let anno = document.querySelector("#Anno").value;
 
+    let aula = cercaAula(giorno, ora, sezione, indirizzo, anno);
+
+    document.querySelector("#aula").innerHTML = aula;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function cercaPerClasse() {
+  try {
+    let giorno = document.querySelector("#Giorno").value;
+    let ora = document.querySelector("#Ora").value;
+    let anno = document.querySelector("#trovaAula input[name='option']:checked").value;
+    let classe = document.querySelector("#Classe").value;
+
+    let sezione = classe.substr(1, 1);
+    let indirizzo = classe.substr(3);
+
+    let aula = cercaAula(giorno, ora, sezione, indirizzo, anno);
+
+    document.querySelector("#aula").innerHTML = aula;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+/**
+ * Cerca l'aula
+ */
+function cercaAula(giorno, ora, sezione, indirizzo, anno) {
+  console.log("gg: %s - hh: %s - sez: %s - ind: %s - yy: %s", giorno, ora, sezione, indirizzo, anno)
+
     let room = {
       Giorno: giorno,
       Ora: ora,
       Classe: anno + sezione + "_" + indirizzo
     };
-
 
     // creo chiave composta
     let key = getRoomKey(room);
@@ -80,10 +119,7 @@ function cercaAula() {
       }
     }
 
-    document.querySelector("#aula").innerHTML = aula;
-  } catch (e) {
-    console.error(e);
-  }
+    return aula;
 }
 
 function cercaAulaPer(giorno, ora, classe, roomMap) {
@@ -256,11 +292,13 @@ function getRoomKey(room) {
 /**
  * Popola la mappa di indirizzi, sezioni e anni con i valori delle attivita'
  * @param {Map} roomMap la mappa delle attivita' 
- * @param {Map} roomMap la mappa della scuola, con indirizzi, anni e sezioni 
+ * @param {Map} schoolMap la mappa della scuola per anni 
+ * @param {Map} schoolByYearMap la mappa della scuola, con indirizzi, anni e sezioni 
+ * schoolByYearMap
  * @param {Map} giorniSet i giorni
  * @param {Map} oreSet le ore
  */
-function populateSchoolMap(roomMap, schoolMap, giorniSet, oreSet)  {
+function populateSchoolMap(roomMap, schoolMap, schoolByYearMap, giorniSet, oreSet)  {
   if (roomMap) {
 
     roomMap.forEach( (room, key) => {
@@ -289,6 +327,20 @@ function populateSchoolMap(roomMap, schoolMap, giorniSet, oreSet)  {
         // Associo anno con insieme sezioni (1 -> [A, B, ...]) 
         let sezione = room.Classe.substr(1, 1);
         sezioniMap.set(sezione, 1);
+      }
+
+      // popolo per anni
+      if (room.Classe) {
+        let anno = room.Classe.substr(0, 1);
+
+        let anniMap = schoolByYearMap.get(anno);
+        if (! anniMap) {
+          anniMap = new Set();
+          schoolByYearMap.set(anno, anniMap);
+        }
+
+        // Associo anno con le sezioni (1 -> [A, B, ...]) 
+        anniMap.add(room.Classe);
       }
     });
   }
@@ -341,11 +393,31 @@ function updateSezioniSelectbox(schoolMap) {
 }
 
 /**
+ * Aggiorna la selectbox 'classi' nella pagina web
+*/
+function updateClassiSelectbox(schoolByYearMap) {
+  try {
+    if (schoolByYearMap) {
+      let year = document.querySelector("#trovaAula input[name='option']:checked").value;
+      if (year) {
+        console.log(year);
+        let anniMap = schoolByYearMap.get(year);
+        if (anniMap) {
+          populateSelectBox("#Classe", Array.from(anniMap.keys()));
+        }
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+/**
  * Popola le selectbox.
  * @param {String} id l'identificativo della selectbox
  * @param {Set} valueSet il set di valori da inserire
  */
-function populateSelectBox(id, valueSet) {
+function populateSelectBox(id, valueSet, initialValue) {
   let selectbox = document.querySelector(id);
 
   if (selectbox && selectbox.children) {
@@ -353,17 +425,33 @@ function populateSelectBox(id, valueSet) {
       elem.remove();
     });
   }
+  
+  const defaultOption = document.createElement('option');
+  defaultOption.disabled = true;
+  defaultOption.text = 'Seleziona';
+  selectbox.add(defaultOption);
 
+  let valueSelected = false;
+  
   valueSet.forEach( value => {
     const option = document.createElement('option');
     option.value = value;
     option.textContent = value;
+
+    console.log(value);
+
+    if (initialValue) {
+      if (initialValue === value) {
+        console.log("initialValue: " + value);
+
+        option.selected = true;
+        valueSelected = true;
+      }
+    }
     selectbox.appendChild(option);
   })
 
-  const defaultOption = document.createElement('option');
-  defaultOption.disabled = true;
-  defaultOption.selected = true;
-  defaultOption.text = 'Seleziona';
-  selectbox.add(defaultOption);
+  if ( ! valueSelected) {
+    defaultOption.selected = true;
+  }
 }
