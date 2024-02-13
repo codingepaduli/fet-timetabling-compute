@@ -4,17 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cerca la tua aula</title>
-    
     <meta name="subject" content="Cerca l'aula">
     <meta name="description" content="Cerca l'aula">
-    
     <link rel="stylesheet" type="text/css" href="https://dohliam.github.io/dropin-minimal-css/min/clmaterial.min.css">
   </head>
   <body>
     <div id="trovaAula">
       <h1>Trova l'aula</h1>
-
       <style>
+        #radioRow * {
+          display: inline;
+          margin-right: 1rem;
+        }
         .hidden {
           display: none;
         }
@@ -31,64 +32,48 @@
           word-break: break-all;
         } 
       </style>
-
       <label for="Giorno">Giorno:</label>
       <select id="Giorno"></select>
-
       <label for="Ora">Ora:</label>
       <select id="Ora"></select>
-
       <div class="useIt">
         <label>Anno</label>
-      
-        <input type="radio" id="anno1" name="option" value="1" />
-        <label for="anno1">1</label>
-
-        <input type="radio" id="anno2" name="option" value="2" checked />
-        <label for="anno2">2</label>
-
-        <input type="radio" id="anno3" name="option" value="3">
-        <label for="anno3">3</label>
-
-        <input type="radio" id="anno4" name="option" value="4">
-        <label for="anno4">4</label>
-
-        <input type="radio" id="anno5" name="option" value="5">
-        <label for="anno5">5</label>
-
+        <div id="radioRow">
+          <input type="radio" id="anno1" name="option" value="1" />
+          <label for="anno1">1</label>
+          <input type="radio" id="anno2" name="option" value="2" checked />
+          <label for="anno2">2</label>
+          <input type="radio" id="anno3" name="option" value="3">
+          <label for="anno3">3</label>
+          <input type="radio" id="anno4" name="option" value="4">
+          <label for="anno4">4</label>
+          <input type="radio" id="anno5" name="option" value="5">
+          <label for="anno5">5</label>
+        </div>
         <label for="Classe">Classe:</label>
         <select id="Classe"></select>
-
         <div class="cerca">
           <button id="cercaPerClasse">Cerca aula</button>
         </div>
       </div>
-
       <div class="hidden">
         <label for="Indirizzo">Indirizzo:</label>
         <select id="Indirizzo"></select>
-        
         <label for="Anno">Anno:</label>
         <select id="Anno"></select>
-
         <label for="Sezione">Sezione:</label>
         <select id="Sezione"></select>
-
         <div class="cerca">
           <button id="cerca">Cerca aula</button>
         </div>
       </div>
-      
       <div class="aula">
         <h2 id="aula"></h2>
       </div>
-
       <script src="./data/aule.js"></script>
       <script src="./data/timetable.js"></script>
       <script src="./libs/cercaAula.js"></script>
     </div>
-
     <script src="https://dohliam.github.io/dropin-minimal-css/switcher.js" type="text/javascript"></script>
-
   </body>
 </html>
