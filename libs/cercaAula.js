@@ -19,13 +19,61 @@ class ValidationError extends Error {
 
 let roomMap = null;
 let activityWeeklyMap = null;
+let extraRoomMap = null;
 
 const schoolMap = new Map();
 const schoolByYearMap = new Map();
 const giorniSet = new Set();
 const oreSet = new Set();
 
+let extra;
+
+new Promise((resolve) => {
+  console.log('Resolving this');
+  resolve("Resolving this");
+}).then(() => {
+  return fetch('http://localhost:5500/data/addedClasses.js', { headers: { 'Content-Type': 'application/json' }})
+}).then((response) => {
+  if (!response.ok) {
+    throw new Error('Network response was not ok ' + response.statusText);
+  }
+  return response.json();
+}).then((response) => {
+  extra = response;
+  roomMap = createHourlyActivityMap(aule);
+  return roomMap;
+}).then((response) => {
+  extraRoomMap = createHourlyActivityMap(extra);
+  return extraRoomMap;
+}).then((response) => {
+  extraRoomMap.forEach((value, key) => { 
+    console.log(key);
+    roomMap.set(key, value); 
+  });
+  return true;
+}).then((response) => {
+  activityWeeklyMap = createActivityWeeklyMap(timetable);
+  return activityWeeklyMap;
+}).then((response) => {
+  console.dir(roomMap)
+  populateSchoolMap(roomMap, schoolMap, schoolByYearMap, giorniSet, oreSet);
+  return true;
+}).then((response) => {
+  currentDay = GIORNI[new Date().getDay()];
+
+  populateSelectBox("#Giorno", giorniSet, currentDay);
+  populateSelectBox("#Ora", oreSet);
+  populateSelectBox("#Indirizzo", Array.from(schoolMap.keys()));
+
+  updateClassiSelectbox(schoolByYearMap);
+}).catch((error) => {
+  console.error('Promise rejected', error);
+})
+
+/*
 try {
+  const extra = getExtraClasses();
+
   roomMap = createHourlyActivityMap(aule);
   activityWeeklyMap = createActivityWeeklyMap(timetable);
   populateSchoolMap(roomMap, schoolMap, schoolByYearMap, giorniSet, oreSet);
@@ -43,6 +91,7 @@ try {
     console.dir(e.cause);
   }
 }
+*/
 
 document.querySelector("#Indirizzo").addEventListener("change", () => {
   updateAnniSelectbox(schoolMap);
@@ -139,6 +188,7 @@ function cercaAulaPer(giorno, ora, classe, roomMap) {
     console.info("Cerco per chiave " + key);
 
     roomFound = roomMap.get(key);
+    console.dir(roomMap);
 
     if (!roomFound) {
       console.info("Non trovata per " + key);
