@@ -1,4 +1,4 @@
-const GIORNI = ["DOMENICA", "LUNEDI'", "MARTEDI'", "MERCOLEDI'", "GIOVEDI'", "VENERDI'", "SABATO"];
+const GIORNI = ["DOMENICA", "LUNEDI", "MARTEDI", "MERCOLEDI", "GIOVEDI", "VENERDI", "SABATO"];
 
 const ORE_MAP = new Map();
 ORE_MAP.set("08:00 - 09:00", 1);
