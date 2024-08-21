@@ -52,16 +52,20 @@ function populateForm() {
 function createTable(auleArray) {
   addTemplate("#tabellaAule", "#tableTemplate");
 
-  auleArray.data.forEach((aula) => {
+  for (let i = 0; i<auleArray.data.length; i++) {
+    let aula = auleArray.data[i];
+    
     // add table rows
     addTemplate("#table", "#tableDataRowTemplate");
     replaceTemplateData('.tableDataRow:last-child', aula);
     
     const nodeSelected = document.querySelector('.tableDataRow:last-child');
-    nodeSelected.aula = aula;
-    nodeSelected.setAttribute("aula", JSON.stringify(aula));
-    nodeSelected.addEventListener("click", () => showRoom(nodeSelected.aula));
-  });
+    nodeSelected.addEventListener("click", () => showRoom(i, auleArray.data[i]));
+  };
+  
+  const rootSelected = document.querySelector('#tabellaAule');
+  rootSelected.rooms = auleArray.data;
+  rootSelected.setAttribute("rooms", JSON.stringify(auleArray.data));
 
 }
 
@@ -100,17 +104,17 @@ function replaceTemplateData(dataNodeSelector, dataToReplace={}) {
   });
 }
 
-function showRoom(aula) {
+function showRoom(index, aula) {
   console.log(aula);
   aula.Classe = "6C_Tlc"
-  salvaAule();
+  salvaAule(index, aula);
 } 
 
-function salvaAule() {
-  const rooms = [];
-  const roomNodes = document.querySelectorAll('#tabellaAule .tableDataRow');
-  roomNodes.forEach(roomNode => {
-    rooms.push(roomNode.aula);
-  });
+function salvaAule(index, aula) {
+  const rooms = document.querySelector('#tabellaAule').rooms;
+  console.dir(rooms);
+
+  aula.Classe = "6C_Tlc"
+  rooms[index] = aula;
   crudService.post( { "data": rooms } );
 }
