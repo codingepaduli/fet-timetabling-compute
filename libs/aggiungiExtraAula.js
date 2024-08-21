@@ -10,21 +10,21 @@ mockData={
     },
     {
       "Extra": "NO",
-      "Giorno": "LUNEDI",
+      "Giorno": "MAR",
       "Ora": "2°",
       "Classe": "4A_INF",
       "Aula": "12345"
     },
     {
       "Extra": "NO",
-      "Giorno": "LUNEDI",
+      "Giorno": "MER",
       "Ora": "2°",
       "Classe": "4A_INF",
       "Aula": "12345"
     },
     {
       "Extra": "NO",
-      "Giorno": "LUNEDI",
+      "Giorno": "GIO",
       "Ora": "2°",
       "Classe": "4A_INF",
       "Aula": "12345"
@@ -55,8 +55,14 @@ function createTable(auleArray) {
   auleArray.data.forEach((aula) => {
     // add table rows
     addTemplate("#table", "#tableDataRowTemplate");
-    replaceTemplateData('#tableDataRow', aula)
+    replaceTemplateData('.tableDataRow:last-child', aula);
+    
+    const nodeSelected = document.querySelector('.tableDataRow:last-child');
+    nodeSelected.aula = aula;
+    nodeSelected.setAttribute("aula", JSON.stringify(aula));
+    nodeSelected.addEventListener("click", () => showRoom(nodeSelected.aula));
   });
+
 }
 
 function addTemplate(targetId, templateID) {
@@ -75,16 +81,16 @@ function addTemplate(targetId, templateID) {
   }
 }
 
-function replaceTemplateData(dataNodesID, dataToReplace={}) {
-  if (typeof dataNodesID !== 'string' && ! (dataNodesID instanceof String) ) {
-    throw new Error("param 'targetId' is not a string");
+function replaceTemplateData(dataNodeSelector, dataToReplace={}) {
+  if (typeof dataNodeSelector !== 'string' && ! (dataNodeSelector instanceof String) ) {
+    throw new Error("param 'dataNodeSelector' is not a string");
   }
   if (!dataToReplace instanceof Object || Array.isArray(dataToReplace) || dataToReplace === null) {
-    throw new Error("param 'dataToReplace' should be undefined or an object (empty object is allowed)");
+    throw new Error("param 'dataToReplace' is not an object (empty object is allowed)");
   }
 
-  const nodeToReplace = document.querySelectorAll(dataNodesID + " .replaceData");
-  console.debug(`Found ${nodeToReplace.length} elements to replace in node ${dataNodesID}`);
+  const nodeToReplace = document.querySelectorAll(dataNodeSelector + " .replaceData");
+  console.debug(`Found ${nodeToReplace.length} elements to replace in node ${dataNodeSelector}`);
 
   nodeToReplace.forEach(node => {
     Object.entries(dataToReplace).forEach(([key, val]) => {
@@ -92,4 +98,19 @@ function replaceTemplateData(dataNodesID, dataToReplace={}) {
       node.textContent = node.textContent.replace(`\$\{${key}\}` , `${val}`);
     });
   });
+}
+
+function showRoom(aula) {
+  console.log(aula);
+  aula.Classe = "6C_Tlc"
+  salvaAule();
+} 
+
+function salvaAule() {
+  const rooms = [];
+  const roomNodes = document.querySelectorAll('#tabellaAule .tableDataRow');
+  roomNodes.forEach(roomNode => {
+    rooms.push(roomNode.aula);
+  });
+  crudService.post( { "data": rooms } );
 }
