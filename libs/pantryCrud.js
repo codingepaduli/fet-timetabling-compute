@@ -2,14 +2,20 @@ const YOUR_PANTRY_ID="1fc033bf-3da6-4e2f-89dc-a47e79829456";
 const YOUR_PANTRY_BASKET="extraAule";
 const YOUR_PANTRY_BASKET_URL=`https://getpantry.cloud/apiv1/pantry/${YOUR_PANTRY_ID}/basket/${YOUR_PANTRY_BASKET}`;
 
+
 const YOUR_NPOINT_ID="cb6d9d7728f81560283e";
 const YOUR_NPOINT_DOC="extraAule";
 const YOUR_NPOINT_DOC_URL=`https://api.npoint.io/${YOUR_NPOINT_ID}`;
 
-const YOUR_JSONSILO_ID="84aa0fca-a872-4866-982d-4a24cdb4f051";
-const YOUR_JSONSILO_URL=`https://api.jsonsilo.com/api/v1/manage/${YOUR_JSONSILO_ID}`;
+const JSONSILO_EXTRA_ROOMS_ID="84aa0fca-a872-4866-982d-4a24cdb4f051";
+const JSONSILO_EXTRA_ROOMS_URL=`https://api.jsonsilo.com/api/v1/manage/${JSONSILO_EXTRA_ROOMS_ID}`;
 
-const SERVICE_URL=YOUR_PANTRY_BASKET_URL;
+const JSONSILO_AVAILABLE_ROOMS_ID="89944785-b188-4924-aaad-b4114fa616cf";
+const JSONSILO_AVAILABLE_ROOMS_URL=`https://api.jsonsilo.com/api/v1/manage/${JSONSILO_AVAILABLE_ROOMS_ID}`;
+
+const SERVICE_EXTRA_ROOMS_URL=YOUR_PANTRY_BASKET_URL;
+const SERVICE_AVAILABLE_ROOMS_URL=null;
+
 
 class CrudService {
   constructor(url) {
@@ -38,39 +44,4 @@ class CrudService {
   post(data={}, path="") {
     return this.#httpCall(path, JSON.stringify(data), {method: 'POST'});
   }
-}
-
-crudService = new CrudService(SERVICE_URL);
-
-function get() {
-  var raw = "";
-  
-  var requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-  
-  fetch(SERVICE_URL, requestOptions)
-    .then(response => response.text())
-    .then(result => console.log(result))
-    .catch(error => console.log('error', error));
-}
-
-function put() {
-  var raw = JSON.stringify({
-    "obj": "value"
-  });
-
-  var requestOptions = {
-    method: 'PUT',
-    headers: myHeaders,
-    body: raw,
-    redirect: 'follow'
-  };
-
-  fetch(SERVICE_URL, requestOptions)
-    .then(response => response.text())
-    .then(result => console.log(result))
-    .catch(error => console.log('error', error));
 }

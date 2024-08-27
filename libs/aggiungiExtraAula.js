@@ -32,13 +32,14 @@ mockData={
   ]
 };
 
+let extraRoomsCrudService = new CrudService(SERVICE_EXTRA_ROOMS_URL);
+
 document.querySelector("#get").addEventListener("click", () => populateForm());
-document.querySelector("#put").addEventListener("click", () => crudService.put(mockData));
-document.querySelector("#post").addEventListener("click", () => crudService.post(mockData));
+document.querySelector("#put").addEventListener("click", () => extraRoomsCrudService.put(mockData));
+document.querySelector("#post").addEventListener("click", () => extraRoomsCrudService.post(mockData));
 
 function populateForm() {
-  crudService = new CrudService(SERVICE_URL);
-  crudService.get().then((response) => {
+  extraRoomsCrudService.get().then((response) => {
     if (!response.ok) {
       throw new Error('Network response was not ok ' + response.statusText);
     }
@@ -116,5 +117,5 @@ function salvaAule(index, aula) {
 
   aula.Classe = "6C_Tlc"
   rooms[index] = aula;
-  crudService.post( { "data": rooms } );
+  extraRoomsCrudService.post( { "data": rooms } );
 }
