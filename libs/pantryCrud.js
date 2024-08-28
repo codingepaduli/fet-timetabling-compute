@@ -1,7 +1,8 @@
 const YOUR_PANTRY_ID="1fc033bf-3da6-4e2f-89dc-a47e79829456";
-const YOUR_PANTRY_BASKET="extraAule";
-const YOUR_PANTRY_BASKET_URL=`https://getpantry.cloud/apiv1/pantry/${YOUR_PANTRY_ID}/basket/${YOUR_PANTRY_BASKET}`;
-
+const PANTRY_EXTRA_ROOMS_BASKET="extraAule";
+const PANTRY_AVAILABLE_ROOMS_BASKET="availableRooms";
+const PANTRY_EXTRA_ROOMS_URL=`https://getpantry.cloud/apiv1/pantry/${YOUR_PANTRY_ID}/basket/${PANTRY_EXTRA_ROOMS_BASKET}`;
+const PANTRY_AVAILABLE_ROOMS_URL=`https://getpantry.cloud/apiv1/pantry/${YOUR_PANTRY_ID}/basket/${PANTRY_AVAILABLE_ROOMS_BASKET}`;
 
 const YOUR_NPOINT_ID="cb6d9d7728f81560283e";
 const YOUR_NPOINT_DOC="extraAule";
@@ -13,9 +14,8 @@ const JSONSILO_EXTRA_ROOMS_URL=`https://api.jsonsilo.com/api/v1/manage/${JSONSIL
 const JSONSILO_AVAILABLE_ROOMS_ID="89944785-b188-4924-aaad-b4114fa616cf";
 const JSONSILO_AVAILABLE_ROOMS_URL=`https://api.jsonsilo.com/api/v1/manage/${JSONSILO_AVAILABLE_ROOMS_ID}`;
 
-const SERVICE_EXTRA_ROOMS_URL=YOUR_PANTRY_BASKET_URL;
-const SERVICE_AVAILABLE_ROOMS_URL=null;
-
+const SERVICE_EXTRA_ROOMS_URL=PANTRY_EXTRA_ROOMS_URL;
+const SERVICE_AVAILABLE_ROOMS_URL=PANTRY_AVAILABLE_ROOMS_URL;
 
 class CrudService {
   constructor(url) {
