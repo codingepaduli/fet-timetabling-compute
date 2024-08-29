@@ -33,3 +33,93 @@ function replaceTemplateData(dataNodeSelector, dataToReplace={}) {
     });
   });
 }
+
+/**
+ * Popola le selectbox.
+ * 
+ * @param {String} id l'identificativo della selectbox
+ * @param {array} arrayValue l'array di valori da inserire
+ * @param {String} defaultKey il valore di default
+ */
+function populateSelectBoxByArrayValues(id, arrayValue, defaultKey=null) {
+  const valueMap = new Map(arrayValue.map((value, index) => [value, value]));
+  populateSelectBoxByMap(id, valueMap, defaultKey=null);
+}
+
+/**
+ * Popola le selectbox.
+ * 
+ * @param {String} id l'identificativo della selectbox
+ * @param {array} arrayIndexed l'array di valori da inserire
+ * @param {String} defaultKey il valore di default
+ */
+function populateSelectBoxByArrayIndexed(id, arrayIndexed, defaultKey=null) {
+  const valueMap = new Map(arrayIndexed.map((value, index) => [index, value]));
+  populateSelectBoxByMap(id, valueMap, defaultKey=null);
+}
+
+/**
+ * Popola le selectbox.
+ * 
+ * @param {String} id l'identificativo della selectbox
+ * @param {Map} keyValueMap la mappa di valori da inserire
+ * @param {String} defaultKey il valore di default
+ */
+function populateSelectBoxByMap(id, keyValueMap, defaultKey=null) {
+  let selectbox = document.querySelector(id);
+
+  if (selectbox && selectbox.children) {
+    Array.from(selectbox.children).forEach( elem => {
+      elem.remove();
+    });
+  }
+  
+  const defaultOption = document.createElement('option');
+  defaultOption.disabled = true;
+  defaultOption.text = 'Seleziona';
+  selectbox.add(defaultOption);
+
+  let valueSelected = false;
+  
+  keyValueMap.forEach((value, key) => { 
+    const option = document.createElement('option');
+    option.value = key;
+    option.textContent = value;
+
+    if (option.value === defaultKey) {
+      console.log("initialValue: " + value);
+
+      option.selected = true;
+      valueSelected = true;
+    }
+    selectbox.appendChild(option);
+  })
+
+  if ( ! valueSelected) {
+    defaultOption.selected = true;
+  }
+}
+
+/*
+<input type="text" id="someID">
+
+var el = document.getElementById("someID")
+var obj = new some_class();
+bind(el,'input',obj,'variable');
+
+p.variable="yes"
+ */
+function bind(el, attribute, obj, varname) {
+  Object.defineProperty(obj, varname, {
+      get: () => {
+          return el[`${attribute}`];
+      },
+      set: (value) => {
+          el[`${attribute}`] = value;
+      }
+  })
+}
+
+// How to JSON a Map (don't with nested maps)
+// jsonText = JSON.stringify(Array.from(MAP.entries()));
+// new Map(JSON.parse(jsonText));

@@ -10,8 +10,13 @@
   </head>
   <body>
 
-      <template id="tableTemplate">
-        <table id="table">
+      <template id="extraRoomTableTemplate">
+        <table id="extraRoomTable">
+          <tr>
+            <td colspan="7">
+              <button id="addNewRoom" style="width: 100%;">Aggiungi aula</button>
+            </td>
+          </tr>
           <tr>
             <th>Extra</th>
             <th>Giorno</th>
@@ -45,25 +50,13 @@
           <input type="text" name="Extra" id="ExtraInputId" required value="SI">
 
           <label for="GiornoInputId">Giorno</label>
-          <select name="Giorno" id="GiornoInputId" required>
+          <select name="Giorno" id="GiornoInputId">
             <option value="">Tutta la settimana</option>
-            <option value="Lunedi">Lunedi</option>
-            <option value="Martedi">Martedi</option>
-            <option value="Mercoledi">Mercoledi</option>
-            <option value="Giovedi">Giovedi</option>
-            <option value="Venerdi">Venerdi</option>
           </select>
 
           <label for="OraInputId">Ora</label>
           <select name="Ora" id="OraInputId">
             <option value="">Tutte</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
           </select>
 
           <label for="ClasseInputId">Classe</label>

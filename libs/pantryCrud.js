@@ -36,7 +36,12 @@ class CrudService {
 
   get(path="") {
     // ADD header {"X-MAN-API": "extraClass"}
-    return this.#httpCall(path, null, {method: 'GET'});
+    return this.#httpCall(path, null, {method: 'GET'}).then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+      });
   }
   put(data={}, path="") {
     return this.#httpCall(path, JSON.stringify(data), {method: 'PUT'});
