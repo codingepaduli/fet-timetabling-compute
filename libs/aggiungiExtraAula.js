@@ -157,7 +157,7 @@ function showRoom(index, aula) {
 
   populateSelectBoxByArrayValues('#ClasseInputId', classes, aulaDaSalvare.Classe);
   populateSelectBoxByMap('#OraInputId', hours, aulaDaSalvare.Ora);
-  populateSelectBoxByArrayIndexed('#GiornoInputId', days, aulaDaSalvare.Giorno);
+  populateSelectBoxByArrayValues('#GiornoInputId', days, aulaDaSalvare.Giorno);
 
   console.debug(`index = ${index}`);
   if (index >= 0) {

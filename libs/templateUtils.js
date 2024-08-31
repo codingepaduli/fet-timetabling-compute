@@ -87,6 +87,9 @@ function populateSelectBoxByMap(id, keyValueMap, defaultKey=null) {
     option.value = key;
     option.textContent = value;
 
+    console.dir(key);
+    console.dir(value);
+
     if (option.value === defaultKey) {
       console.trace("initialValue: " + value);
 
@@ -127,3 +130,9 @@ function bind(el, attribute, obj, varname) {
 // How to JSON a Map (don't with nested maps)
 // jsonText = JSON.stringify(Array.from(MAP.entries()));
 // new Map(JSON.parse(jsonText));
+
+// To start with a Promise:
+// new Promise((resolve) => {
+//   console.log('Resolving this');
+//   resolve("Resolving this");
+// }).then ...

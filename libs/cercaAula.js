@@ -26,44 +26,27 @@ const schoolByYearMap = new Map();
 const giorniSet = new Set();
 const oreSet = new Set();
 
-let extra;
+let extraRoomsCrudService = new CrudService(SERVICE_EXTRA_ROOMS_URL);
+let availableRoomsCrudService = new CrudService(SERVICE_AVAILABLE_ROOMS_URL);
 
-new Promise((resolve) => {
-  console.log('Resolving this');
-  resolve("Resolving this");
-}).then(() => {
-  return fetch('http://localhost:5500/data/addedClasses.js', { headers: { 'Content-Type': 'application/json' }})
-}).then((response) => {
-  if (!response.ok) {
-    throw new Error('Network response was not ok ' + response.statusText);
-  }
-  return response.json();
-}).then((response) => {
-  extra = response;
+extraRoomsCrudService.get().then((extraRooms) => {
+  console.info(`Rest API get ${extraRooms.data.length} extra rooms...`);
+  aule = aule.concat(extraRooms.data);
   roomMap = createHourlyActivityMap(aule);
-  return roomMap;
-}).then((response) => {
-  extraRoomMap = createHourlyActivityMap(extra);
-  return extraRoomMap;
-}).then((response) => {
-  extraRoomMap.forEach((value, key) => { 
-    console.log(key);
-    roomMap.set(key, value); 
-  });
-  return true;
-}).then((response) => {
+  return;
+}).then(() => {
   activityWeeklyMap = createActivityWeeklyMap(timetable);
-  return activityWeeklyMap;
-}).then((response) => {
-  console.dir(roomMap)
+  return;
+}).then(() => {
   populateSchoolMap(roomMap, schoolMap, schoolByYearMap, giorniSet, oreSet);
-  return true;
-}).then((response) => {
+  return;
+}).then(() => {
   currentDay = GIORNI[new Date().getDay()];
 
-  populateSelectBox("#Giorno", giorniSet, currentDay);
-  populateSelectBox("#Ora", oreSet);
-  populateSelectBox("#Indirizzo", Array.from(schoolMap.keys()));
+  populateSelectBoxByArrayValues("#Giorno", Array.from(giorniSet), currentDay);
+  populateSelectBoxByArrayValues("#Indirizzo", Array.from(schoolMap.keys()));
+  let reverseHours = new Map(Array.from(ORE_MAP.entries(), entry => entry.reverse()));
+  populateSelectBoxByMap("#Ora", reverseHours);
 
   updateClassiSelectbox(schoolByYearMap);
 }).catch((error) => {
@@ -222,6 +205,7 @@ function cercaAulaPer(giorno, ora, classe, roomMap) {
 
 function createActivityWeeklyMap(timetable) {
   let classWeeklyMap = new Map();
+  console.info(`creating ${timetable.length} activity...`);
 
   // Creo la mappa oraria degli insegnanti
   timetable.forEach(activity => {
@@ -253,6 +237,7 @@ function createHourlyActivityMap(activityList) {
   const roomMap = new Map();
   
   if (activityList) {
+    console.info(`validating ${activityList.length} rooms...`);
     activityList.forEach(room => {
       let validRoom = validateRoom(room);
 
@@ -350,6 +335,7 @@ function getRoomKey(room) {
  */
 function populateSchoolMap(roomMap, schoolMap, schoolByYearMap, giorniSet, oreSet)  {
   if (roomMap) {
+    console.info(`populating maps...`);
 
     roomMap.forEach( (room, key) => {
       if (room.Giorno) {
@@ -407,11 +393,11 @@ function updateAnniSelectbox(schoolMap) {
       if (indirizzo) {
         let anniMap = schoolMap.get(indirizzo);
         if (anniMap) {
-          populateSelectBox("#Anno", Array.from(anniMap.keys()));
+          populateSelectBoxByArrayValues("#Anno", Array.from(anniMap.keys()));
         }
       }
 
-      populateSelectBox("#Sezione", new Array());
+      populateSelectBoxByArrayValues("#Sezione", new Array());
     }
   } catch (e) {
     console.error(e);
@@ -432,7 +418,7 @@ function updateSezioniSelectbox(schoolMap) {
         if (anno) {
           let sezioni = anniMap.get(anno);
           if (sezioni) {
-            populateSelectBox("#Sezione", Array.from(sezioni.keys()));
+            populateSelectBoxByArrayValues("#Sezione", Array.from(sezioni.keys()));
           }
         }
       }
@@ -453,55 +439,11 @@ function updateClassiSelectbox(schoolByYearMap) {
         console.log(year);
         let anniMap = schoolByYearMap.get(year);
         if (anniMap) {
-          populateSelectBox("#Classe", Array.from(anniMap.keys()));
+          populateSelectBoxByArrayValues("#Classe", Array.from(anniMap.keys()));
         }
       }
     }
   } catch (e) {
     console.error(e);
-  }
-}
-
-/**
- * Popola le selectbox.
- * @param {String} id l'identificativo della selectbox
- * @param {Set} valueSet il set di valori da inserire
- */
-function populateSelectBox(id, valueSet, initialValue) {
-  let selectbox = document.querySelector(id);
-
-  if (selectbox && selectbox.children) {
-    Array.from(selectbox.children).forEach( elem => {
-      elem.remove();
-    });
-  }
-  
-  const defaultOption = document.createElement('option');
-  defaultOption.disabled = true;
-  defaultOption.text = 'Seleziona';
-  selectbox.add(defaultOption);
-
-  let valueSelected = false;
-  
-  valueSet.forEach( value => {
-    const option = document.createElement('option');
-    option.value = value;
-    option.textContent = value;
-
-    console.log(value);
-
-    if (initialValue) {
-      if (initialValue === value) {
-        console.log("initialValue: " + value);
-
-        option.selected = true;
-        valueSelected = true;
-      }
-    }
-    selectbox.appendChild(option);
-  })
-
-  if ( ! valueSelected) {
-    defaultOption.selected = true;
   }
 }
