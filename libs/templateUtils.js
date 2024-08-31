@@ -28,7 +28,7 @@ function replaceTemplateData(dataNodeSelector, dataToReplace={}) {
 
   nodeToReplace.forEach(node => {
     Object.entries(dataToReplace).forEach(([key, val]) => {
-      console.debug(`Replacing \$\{${key}\} --> ${val}`);
+      console.trace(`Replacing \$\{${key}\} --> ${val}`);
       node.textContent = node.textContent.replace(`\$\{${key}\}` , `${val}`);
     });
   });
@@ -66,6 +66,7 @@ function populateSelectBoxByArrayIndexed(id, arrayIndexed, defaultKey=null) {
  * @param {String} defaultKey il valore di default
  */
 function populateSelectBoxByMap(id, keyValueMap, defaultKey=null) {
+  console.debug(`populating selectbox ${id}`);
   let selectbox = document.querySelector(id);
 
   if (selectbox && selectbox.children) {
@@ -87,7 +88,7 @@ function populateSelectBoxByMap(id, keyValueMap, defaultKey=null) {
     option.textContent = value;
 
     if (option.value === defaultKey) {
-      console.log("initialValue: " + value);
+      console.trace("initialValue: " + value);
 
       option.selected = true;
       valueSelected = true;
@@ -105,17 +106,20 @@ function populateSelectBoxByMap(id, keyValueMap, defaultKey=null) {
 
 var el = document.getElementById("someID")
 var obj = new some_class();
-bind(el,'input',obj,'variable');
+bind(el,'value',obj,'variable');
 
 p.variable="yes"
  */
 function bind(el, attribute, obj, varname) {
+  console.trace(`field ${el.id} bound to property ${varname}`);
   Object.defineProperty(obj, varname, {
       get: () => {
-          return el[`${attribute}`];
+        console.debug(`getting from ${el.id}.${attribute}: ` + el[`${attribute}`]);
+        return el[`${attribute}`];
       },
       set: (value) => {
-          el[`${attribute}`] = value;
+        console.debug(`setting ${el.id}.${attribute}=${value}, erasing value ` + el[`${attribute}`]);
+        el[`${attribute}`] = value;
       }
   })
 }

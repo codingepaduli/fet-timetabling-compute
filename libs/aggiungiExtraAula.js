@@ -88,8 +88,8 @@ document.querySelector("#resetAvailable").addEventListener("click", () => availa
 
 
 function getExtraRooms() {
-  extraRoomsCrudService.get().then((auleArray) => {
-    createExtraRoomsTable(auleArray);
+  extraRoomsCrudService.get().then((response) => {
+    createExtraRoomsTable(response);
     return true;
   }).then((response) => {
     return availableRoomsCrudService.get();
@@ -97,6 +97,11 @@ function getExtraRooms() {
     classes = response.data.classes;
     days = response.data.days;
     hours = new Map(Array.from(response.data.hours, hour => hour.reverse()));
+    console.info(`Rest API get ${classes.length} classes, ${days.length} days, ${hours.size} hours, rendering...`);
+    return true;
+  }).catch(error => {
+    console.error(error);
+    alert(`Network error: ${error.message}`);
   });
 }
 
@@ -108,7 +113,8 @@ function createExtraRoomsTable(auleArray) {
 
   addTemplate("#tabellaAule", "#extraRoomTableTemplate");
   document.querySelector("#addNewRoom").addEventListener("click", () => showRoom(-1, {}));
-
+  
+  console.info(`Rest API get ${auleArray.data.length} extra rooms, rendering...`);
   for (let i = 0; i<auleArray.data.length; i++) {
     let aula = auleArray.data[i];
     
@@ -126,13 +132,16 @@ function createExtraRoomsTable(auleArray) {
 }
 
 function showRoom(index, aula) {
+  console.info(`Show extra room at index ${index}`);
+
+  let form = document.querySelector("#formExtraAule");
+  if (form) {
+    form.parentNode.removeChild(form);
+  }
+
   let aulaDaSalvare = {};
 
   addTemplate("#formAula", "#formExtraAuleTemplate");
-  
-  populateSelectBoxByArrayValues('#ClasseInputId', classes, "2A_AER");
-  populateSelectBoxByMap('#OraInputId', hours, "1");
-  populateSelectBoxByArrayIndexed('#GiornoInputId', days);
 
   let dayInput = document.querySelector("#GiornoInputId");
   let oraInput = document.querySelector("#OraInputId");
@@ -145,15 +154,14 @@ function showRoom(index, aula) {
   bind(classeInput, 'value', aulaDaSalvare, 'Classe');
   bind(roomInput, 'value', aulaDaSalvare, 'Aula');
   bind(pianoInput, 'value', aulaDaSalvare, 'Piano');
-  
-  aulaDaSalvare.Extra = "SI";
-  aulaDaSalvare.Giorno = 3;
-  aulaDaSalvare.Ora = 3;
-  aulaDaSalvare.Classe="2A_AER";
-  aulaDaSalvare.Aula=4;
-  aulaDaSalvare.Piano = 543;
 
+  populateSelectBoxByArrayValues('#ClasseInputId', classes, aulaDaSalvare.Classe);
+  populateSelectBoxByMap('#OraInputId', hours, aulaDaSalvare.Ora);
+  populateSelectBoxByArrayIndexed('#GiornoInputId', days, aulaDaSalvare.Giorno);
+
+  console.debug(`index = ${index}`);
   if (index >= 0) {
+    aulaDaSalvare.Extra = "SI";
     aulaDaSalvare.Giorno = aula.Giorno;
     aulaDaSalvare.Ora = aula.Ora;
     aulaDaSalvare.Classe = aula.Classe;
@@ -161,13 +169,9 @@ function showRoom(index, aula) {
     aulaDaSalvare.Piano = aula.Piano;
   }
 
-  let form = document.querySelector("#formExtraAule");
+  form = document.querySelector("#formExtraAule");
   form.addEventListener('submit', function(e) {
     e.preventDefault();
-    console.dir(aulaDaSalvare);
-
-    console.dir(e.submitter.id);
-    console.log(`submit ${e.submitter.id} stop`);
 
     if (e.submitter.id === `saveButton`) {
       updateExtraRooms(index, aulaDaSalvare);
@@ -175,44 +179,68 @@ function showRoom(index, aula) {
     if (e.submitter.id === `deleteButton`) {
       cancellaAulaExtra(index, aulaDaSalvare);
     }
-    if (e.submitter.id === `undoButton`) {
-      undoAulaExtra(index, aulaDaSalvare);
+    
+    let form = document.querySelector("#formExtraAule");
+    if (form) {
+      form.parentNode.removeChild(form);
     }
   });
 }
 
-function updateExtraRooms(index, aula) {
+function updateExtraRooms(index, aulaDaSalvare) {
 
-  console.log(index);
-
-  let aulaDaSalvare = {}
-  aulaDaSalvare.Extra = aula.Extra;
-  aulaDaSalvare.Giorno = aula.Giorno;
-  aulaDaSalvare.Ora = aula.Ora;
-  aulaDaSalvare.Classe = aula.Classe;
-  aulaDaSalvare.Aula = aula.Aula;
-  aulaDaSalvare.Piano = aula.Piano;
+  let aula = {}
+  aula.Extra = "SI";
+  aula.Giorno = aulaDaSalvare.Giorno;
+  aula.Ora = aulaDaSalvare.Ora;
+  aula.Classe = aulaDaSalvare.Classe;
+  aula.Aula = aulaDaSalvare.Aula;
+  aula.Piano = aulaDaSalvare.Piano;
 
   const rooms = document.querySelector('#tabellaAule').rooms;
   if (index === -1) {
-    rooms.push(aulaDaSalvare);
+    rooms.push(aula);
+    console.info(`adding new extra room:`);
+    console.dir(aula);
   }
 
-  if (index > 0) {
-    rooms[index] = aulaDaSalvare;
+  if (index >= 0) {
+    rooms[index] = aula;
+    console.info(`updating extra room at index ${index}`);
+    console.dir(aula);
   }
 
-  extraRoomsCrudService.post( { "data": rooms } );
+  extraRoomsCrudService.post( { "data": rooms } )
+  .then(() => {
+    let form = document.querySelector("#formExtraAule");
+    if (form) {
+      form.parentNode.removeChild(form);
+    }
+    createExtraRoomsTable( { "data": rooms } );
+    return true;
+  }).catch(error => {
+    console.error(error);
+    alert(`Network error: ${error.message}`);
+  });
+
 }
 
 function cancellaAulaExtra(index, aula) {
   const rooms = document.querySelector('#tabellaAule').rooms;
   rooms.splice(index, 1);
-  extraRoomsCrudService.post( { "data": rooms } );
-}
+  console.info(`removing extra room at index ${index}:`);
+  console.dir(aula);
 
-function undoAulaExtra(index, aula) {
-  console.debug(`Aula prop was ${aula.Aula}`);
-  aula.Aula ++;
-  console.debug("TODO undoAulaExtra");
+  extraRoomsCrudService.post( { "data": rooms } )
+  .then(() => {
+    let form = document.querySelector("#formExtraAule");
+    if (form) {
+      form.parentNode.removeChild(form);
+    }
+    createExtraRoomsTable( { "data": rooms } );
+    return true;
+  }).catch(error => {
+    console.error(error);
+    alert(`Network error: ${error.message}`);
+  });
 }
