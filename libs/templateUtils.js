@@ -87,8 +87,7 @@ function populateSelectBoxByMap(id, keyValueMap, defaultKey=null) {
     option.value = key;
     option.textContent = value;
 
-    console.dir(key);
-    console.dir(value);
+    console.trace(`${key} --> ${value}`);
 
     if (option.value === defaultKey) {
       console.trace("initialValue: " + value);

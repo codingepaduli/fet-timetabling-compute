@@ -34,6 +34,7 @@ mockData={
 
 mockClasses = {
   "data": {
+    "msg": "Orario valido dal 01/09/2023 al 30/06/2024",
     "classes": [
       "2A_AER",
       "2A_EN",
