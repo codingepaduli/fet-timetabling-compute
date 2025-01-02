@@ -12,6 +12,8 @@ AULE_JSON="./data/classi.js"
 EXTRA_AULE_JSON="./data/addedClasses.js"
 TIMETABLE_JSON="./data/timetable.js"
 
+WEB_PAGE="cercaAula.min.html"
+
 # Mantengo la prima riga del file CSV
 head -n 1 "$ORIGINAL_AULE_CSV" > "$WORKING_AULE_CSV"
 head -n 1 "$ORIGINAL_EXTRA_AULE_CSV" > "$WORKING_EXTRA_AULE_CSV"
@@ -38,6 +40,10 @@ csvjson --indent 4 "$WORKING_AULE_CSV" >> "$AULE_JSON"
 csvjson --indent 4 "$WORKING_EXTRA_AULE_CSV" >> "$EXTRA_AULE_JSON"
 csvjson --no-inference --indent 4 "$WORKING_TIMETABLE_CSV" >> "$TIMETABLE_JSON"
 
+#########################################################################
+# Minimizzo i file e li copio nella pagina web
+#########################################################################
+
 mkdir -p libs-min
 
 uglifyjs --compress --mangle -o "./libs-min/addedClasses.min.js"      "./data/addedClasses.js" 
@@ -49,6 +55,12 @@ uglifyjs --compress --mangle -o "./libs-min/cercaAula.min.js"         "./libs/ce
 uglifyjs --compress --mangle -o "./libs-min/consoleOverwrite.min.js"  "./libs/consoleOverwrite.js" 
 uglifyjs --compress --mangle -o "./libs-min/pantryCrud.min.js"        "./libs/pantryCrud.js" 
 uglifyjs --compress --mangle -o "./libs-min/templateUtils.min.js"     "./libs/templateUtils.js" 
+
+head -n 72 "cercaAula.html" > "$WEB_PAGE"
+printf "<script>\n" >> "$WEB_PAGE"
+cat "./libs-min/consoleOverwrite.min.js" "./libs-min/pantryCrud.min.js" "./libs-min/templateUtils.min.js" "./libs-min/classi.min.js" "./libs-min/addedClasses.min.js"  "./libs-min/timetable.min.js" "./libs-min/cercaAula.min.js" >> "$WEB_PAGE"
+printf "\n</script>\n" >> "$WEB_PAGE"
+tail -n +80 "cercaAula.html" >> "$WEB_PAGE" 
 
 # Seach in path: -path ./libs/*
 
